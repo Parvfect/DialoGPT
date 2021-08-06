@@ -1,4 +1,14 @@
 
+"""
+Now we will convert our dataset in a format suitable for our model.
+Basically we will concatenate responses in one string for each row 
+(additionally we will add special ‘end of string’ token between responses, 
+so the model will understand the end of each response in a string).
+"""
+
+import training_configuration as tc
+from modules import *
+
 def construct_conv(row, tokenizer, eos = True):
     flatten = lambda l: [item for sublist in l for item in sublist]
     conv = list(reversed([tokenizer.encode(x) + [tokenizer.eos_token_id] for x in row]))
@@ -8,7 +18,7 @@ def construct_conv(row, tokenizer, eos = True):
 class ConversationDataset(Dataset):
     def __init__(self, tokenizer: PreTrainedTokenizer, args, df, block_size=512):
 
-        block_size = block_size - (tokenizer.max_len - tokenizer.max_len_single_sentence)
+        block_size = block_size - (tokenizer.model_max_length - tokenizer.max_len_single_sentence)
 
         directory = args.cache_dir
         cached_features_file = os.path.join(
@@ -82,3 +92,4 @@ def _rotate_checkpoints(args, checkpoint_prefix="checkpoint", use_mtime=False) -
     for checkpoint in checkpoints_to_be_deleted:
         logger.info("Deleting older checkpoint [{}] due to args.save_total_limit".format(checkpoint))
         shutil.rmtree(checkpoint)
+

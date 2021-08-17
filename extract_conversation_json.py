@@ -12,6 +12,21 @@ import uuid
 input_file_location = 'message_1.json'
 conversation = []
 
+def non_contextual_extraction(input_file_location):
+    
+    f = open(input_file_location)
+    data = json.load(f)
+
+    for line in data['messages']:
+        if line != "":
+            try:
+                line = clean_line(line['content'])
+                conversation.append(line)
+            except: 
+                print("Exception")
+
+    write_conversation_to_file()
+
 def extract(input_file_location):
     """Extracts conversation from the input_file """
     
@@ -47,10 +62,7 @@ def extract(input_file_location):
         
         prev_person = person
 
-        if line!= '':
-            dialogue = line + '.' + dialogue
-        else: 
-            dialogue = line + dialogue
+        dialogue += line + " "
 
     write_conversation_to_file()
 
@@ -110,4 +122,4 @@ def reverse_array(arr):
 
 
 if __name__ == '__main__':
-    extract(input_file_location)
+    non_contextual_extraction(input_file_location)

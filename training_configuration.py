@@ -45,7 +45,7 @@ def create_context(conversation, n):
 
 # Create dataframe with columns response and context
 number_context = 7
-context = create_context(extract_conversation('dataset.txt'), number_context)
+context = create_context(extract_conversation('dataset2.txt'), number_context)
 columns = ['response', 'context']
 columns = columns + ['context/' + str(i) for i in range(1,number_context)]
 

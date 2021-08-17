@@ -3,7 +3,7 @@ from modules import *
 
 
 tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('output-small')
+model = AutoModelWithLMHead.from_pretrained('models/model no.620994501465')
 # Let's chat for 5 lines
 for step in range(100):
     # encode the new user input, add the eos_token and return a tensor in Pytorch
@@ -17,10 +17,10 @@ for step in range(100):
         pad_token_id=tokenizer.eos_token_id,  
         no_repeat_ngram_size=0,       
         do_sample=True, 
-        top_k=10, 
-        top_p=0.1,
-        temperature = 0.2
+        top_k=100, 
+        top_p=0.7,
+        temperature = 0.8
     )
     
     # pretty print last ouput tokens from bot
-    print("Pannah: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+    print("Tulip: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))

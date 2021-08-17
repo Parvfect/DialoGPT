@@ -1,11 +1,16 @@
 """
 Class Args for conversion of Python Script arguments to a Colab notebook - not relevent to what I am doing.
+
+-- Changed args output_dir to prevent overwriting of models
+-- Still need it to store in a folder
+
 """
 
+import os
 
 class Args():
     def __init__(self):
-        self.output_dir = 'output-small'
+        self.output_dir = self.generate_random_seed() 
         self.model_type = 'gpt2'
         self.model_name_or_path = 'microsoft/DialoGPT-small'
         self.config_name = 'microsoft/DialoGPT-small'
@@ -37,5 +42,9 @@ class Args():
         self.local_rank = -1
         self.fp16 = False
         self.fp16_opt_level = 'O1'
+
+    def generate_random_seed(self):
+        self.seed = int.from_bytes(os.urandom(5), byteorder='big')
+        return str(self.seed)
 
 args = Args()

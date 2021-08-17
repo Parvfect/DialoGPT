@@ -33,10 +33,7 @@ def extract(input_file_location):
         
         prev_person = person
 
-        if line!= '':
-            dialogue += line + '.'
-        else: 
-            dialogue += line
+        dialogue += line
 
     write_conversation_to_file()
 

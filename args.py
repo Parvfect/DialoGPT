@@ -6,7 +6,8 @@ Class Args for conversion of Python Script arguments to a Colab notebook - not r
 
 """
 
-import os
+import random
+import string
 
 class Args():
     def __init__(self):
@@ -44,7 +45,8 @@ class Args():
         self.fp16_opt_level = 'O1'
 
     def generate_random_seed(self):
-        self.seed = int.from_bytes(os.urandom(5), byteorder='big')
-        return str(self.seed)
+        
+        x = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        return x
 
 args = Args()

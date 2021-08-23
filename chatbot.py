@@ -2,6 +2,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import random
 import tts_gcloud as tts
+from playsound import playsound
 
 model_name = "microsoft/DialoGPT-large"
 
@@ -9,6 +10,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
 ptr_response = []
+
 
 def talk_from_internal():
 
@@ -38,6 +40,9 @@ def talk_from_internal():
         print(f"DialoGPT: {output}")
 
         tts.synthesize_text(output)
+
+        # I think you can't make playsound play something if it's being called by another program?
+        playsound('output.mp3')
 
         step = step + 1
 
@@ -76,4 +81,5 @@ def generate_text():
     num = random.randrange(0,5)
     return nouns[num] + ' ' + verbs[num] + ' ' + adv[num] + ' ' + adj[num]
 
-talk_from_internal()
+if __name__ == "__main__":
+    talk_from_internal()

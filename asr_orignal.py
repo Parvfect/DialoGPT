@@ -1,34 +1,12 @@
-"""
-Performing streaming speech recognition on an audio stream
-Speech-to-Text can also perform recognition on streaming, real-time audio.
-https://cloud.google.com/speech-to-text/docs/streaming-recognize
-"""
-
 from __future__ import division
 
 import re
 import sys
-import colorama
 
 from google.cloud import speech
-from tts_gcloud import synthesize_text
 
 import pyaudio
 from six.moves import queue
-
-import time
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
-import random
-#import tts_gcloud as tts
-from playsound import playsound
-
-model_name = "microsoft/DialoGPT-large"
-
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-
 
 # Audio recording parameters
 RATE = 16000
@@ -117,15 +95,9 @@ def listen_print_loop(responses):
     response is an interim one, print a line feed at the end of it, to allow
     the next result to overwrite it, until the response is a final one. For the
     final one, print a newline to preserve the finalized transcription.
-    """ 
-
-    print("I have started listening")
-    step = 0
-
-    final_transcript = ''
+    """
     num_chars_printed = 0
     for response in responses:
-
         if not response.results:
             continue
 
@@ -153,56 +125,16 @@ def listen_print_loop(responses):
             num_chars_printed = len(transcript)
 
         else:
-            
+            print(transcript + overwrite_chars)
 
-            """
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
             if re.search(r"\b(exit|quit)\b", transcript, re.I):
                 print("Exiting..")
                 break
-            """
 
             num_chars_printed = 0
 
-            text = str(transcript + overwrite_chars)
-
-            print("You: {}".format(text))
-            # encode the input and add end of string token
-            input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
-
-            # concatenate new user input with chat history (if there is)
-            bot_input_ids = torch.cat([chat_history_ids, input_ids], dim=-1) if step > 0 else input_ids
-
-            # generate a bot response
-            chat_history_ids = model.generate(
-                bot_input_ids,
-                max_length=1000,
-                pad_token_id=tokenizer.eos_token_id,
-                temperature = 0.8,
-            )
-
-            #print the output
-            output = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
-            print(f"DialoGPT: {output}")
-
-            synthesize_text(output)
-            
-            step = 1
-            """
-            # So this is where the interfacing starts
-            response = talk_to_dialo(final_transcript)
-            
-            if response != '':
-                print(response)
-                synthesize_text(response)
-            
-            else:
-                print("No reply")
-                synthesize_text("No reply")
-                
-            final_transcript = ''
-            """
 
 def main():
     # See http://g.co/cloud/speech/docs/languages
@@ -228,7 +160,7 @@ def main():
         )
 
         responses = client.streaming_recognize(streaming_config, requests)
-        
+
         # Now, put the transcription responses to use.
         listen_print_loop(responses)
 

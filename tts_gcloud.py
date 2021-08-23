@@ -32,9 +32,9 @@ def synthesize_text(text):
 
     with open("output.mp3", "wb") as out:
         out.write(response.audio_content)
-    
+        out.close()
     playsound("output.mp3")
-    delay(4)
+    
 
 def play_sound(audio_path):
 

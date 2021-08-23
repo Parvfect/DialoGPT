@@ -24,6 +24,14 @@ import random
 #import tts_gcloud as tts
 from playsound import playsound
 
+import win32api
+import win32gui
+
+WM_APPCOMMAND = 0x319
+APPCOMMAND_MICROPHONE_VOLUME_MUTE = 0x180000
+
+
+
 model_name = "microsoft/DialoGPT-large"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -103,6 +111,10 @@ class MicrophoneStream(object):
             yield b"".join(data)
 
 
+
+def toggle_mic():
+    win32api.PostMessage(win32gui.GetForegroundWindow(), WM_APPCOMMAND, 0, APPCOMMAND_MICROPHONE_VOLUME_MUTE)
+
 def listen_print_loop(responses):
     """Iterates through server responses and prints them.
 
@@ -168,6 +180,8 @@ def listen_print_loop(responses):
             text = str(transcript + overwrite_chars)
 
             print("You: {}".format(text))
+            
+          
             # encode the input and add end of string token
             input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
 
@@ -186,7 +200,13 @@ def listen_print_loop(responses):
             output = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
             print(f"DialoGPT: {output}")
 
+            # Turn Mic off for response
+            toggle_mic()
+            
             synthesize_text(output)
+            
+            # Turn Mic on for next input
+            toggle_mic()
             
             step = 1
             """

@@ -1,37 +1,79 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import random
+import tts_gcloud as tts
 
-def load_tokenizer_and_model(model = 'microsoft/DialoGPT-large'):
-    """ Load tokenizer and model """
-    # Initialize tokenizer and model
-    tokenizer = AutoTokenizer.from_pretrained(model)
-    model = AutoModelForCausalLM.from_pretrained(model)
-   
-    return tokenizer, model
+model_name = "microsoft/DialoGPT-large"
 
-def generate_response(tokenizer, model, chat_round, chat_history_ids):
-    """ Generate response to a given user input """
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+ptr_response = []
+
+def talk_from_internal():
+
+    step = 0
+
+    # chatting 5 times with greedy search
+    while(True):
+
+        # take user input
+        text = feed_response()
+
+        # encode the input and add end of string token
+        input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
+
+        # concatenate new user input with chat history (if there is)
+        bot_input_ids = torch.cat([chat_history_ids, input_ids], dim=-1) if step > 0 else input_ids
+
+        # generate a bot response
+        chat_history_ids = model.generate(
+            bot_input_ids,
+            max_length=1000,
+            pad_token_id=tokenizer.eos_token_id,
+        )
+
+        #print the output
+        output = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+        print(f"DialoGPT: {output}")
+
+        tts.synthesize_text(output)
+
+        step = step + 1
+
+
+
+def feed_response():
+
+    return input("You: ")
+
+def talk_from_external(input_text, step):
     
-    new_input_ids = tokenizer.encode(input(">> You:") + tokenizer.eos_token, return_tensors='pt')
+    # encode the input and add end of string token
+    input_ids = tokenizer.encode(input_text + tokenizer.eos_token, return_tensors="pt")
 
-    bot_input_ids = torch.cat([chat_history_ids, new_input_ids], dim=-1) if chat_round > 0 else new_input_ids
+    # concatenate new user input with chat history (if there is)
+    #bot_input_ids = torch.cat([chat_history_ids, input_ids], dim=-1) if step > 0 else input_ids
 
-    chat_history_ids = model.generate(bot_input_ids, max_length=1250, pad_token_id=tokenizer.eos_token_id, temperature = 1.0, no_repeat_ngram_size = 1)
+    # generate a bot response
+    chat_history_ids = model.generate(
+        input_ids,
+        max_length=1000,
+        pad_token_id=tokenizer.eos_token_id,
+    )
 
-    print("DialoGPT: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+    #print the output
+    output_text = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+    return output_text
 
-    return chat_history_ids
 
-def chat_for_n_rounds(n):
-    """ Chat for n rounds """
+def generate_text():
     
-    tokenizer, model = load_tokenizer_and_model()
-    chat_history_ids = None
-    
-    for chat_round in range(n):
-        chat_history_ids = generate_response(tokenizer, model, chat_round, chat_history_ids)
+    nouns = ("puppy", "car", "rabbit", "girl", "monkey")
+    verbs = ("runs", "hits", "jumps", "drives", "barfs") 
+    adv = ("crazily.", "dutifully.", "foolishly.", "merrily.", "occasionally.")
+    adj = ("adorable", "clueless", "dirty", "odd", "stupid")
+    num = random.randrange(0,5)
+    return nouns[num] + ' ' + verbs[num] + ' ' + adv[num] + ' ' + adj[num]
 
-
-if __name__ == '__main__':
-  chat_for_n_rounds(100)
-    
+talk_from_internal()

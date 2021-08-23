@@ -8,9 +8,8 @@ spec_generator = SpectrogramGenerator.from_pretrained("tts_en_tacotron2")
 # Download and load the pretrained waveglow model
 vocoder = Vocoder.from_pretrained("tts_waveglow_88m")
 
-
 # All spectrogram generators start by parsing raw strings to a tokenized version of the string
-parsed = spec_generator.parse("Saurav can eat my shit. He also likes smelling ass.")
+parsed = spec_generator.parse("Saurav is a whore")
 
 # Then take the tokenized string and produce a spectrogram
 spectrogram = spec_generator.generate_spectrogram(tokens=parsed)

@@ -131,7 +131,7 @@ def listen_print_loop(responses):
     final one, print a newline to preserve the finalized transcription.
     """ 
 
-    print("I have started listening")
+    synthesize_text("I have started listening")
     step = 0
 
     final_transcript = ''
@@ -181,7 +181,15 @@ def listen_print_loop(responses):
 
             print("You: {}".format(text))
             
-          
+            # So if it is a what if - I want it to query a wikipedia summariser
+            # and get the summary of the article
+
+            # If it is a specific action that we want, then we want it to send control to our actions process
+            
+            
+            
+            """
+
             # encode the input and add end of string token
             input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
 
@@ -198,6 +206,9 @@ def listen_print_loop(responses):
 
             #print the output
             output = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+            """
+
+
             print(f"DialoGPT: {output}")
 
             # Turn Mic off for response

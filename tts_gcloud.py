@@ -14,7 +14,7 @@ def synthesize_text(text):
     # Names of voices can be retrieved with client.list_voices().
     voice = texttospeech.VoiceSelectionParams(
         language_code="en-US",
-        name="en-GB-Wavenet-F",
+        name="fr-GB-Wavenet-C",
         ssml_gender=texttospeech.SsmlVoiceGender.FEMALE,
     )
 

@@ -96,6 +96,7 @@ def listen_print_loop(responses):
     the next result to overwrite it, until the response is a final one. For the
     final one, print a newline to preserve the finalized transcription.
     """
+
     num_chars_printed = 0
     for response in responses:
         if not response.results:
@@ -110,7 +111,7 @@ def listen_print_loop(responses):
 
         # Display the transcription of the top alternative.
         transcript = result.alternatives[0].transcript
-
+        
         # Display interim results, but with a carriage return at the end of the
         # line, so subsequent lines will overwrite them.
         #

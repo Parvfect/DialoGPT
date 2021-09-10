@@ -1,8 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import random
-import tts_gcloud as tts
-from playsound import playsound
 
 model_name = "microsoft/DialoGPT-large"
 
@@ -17,10 +15,10 @@ def talk_from_internal():
     step = 0
 
     # chatting 5 times with greedy search
-    while(True):
+    while(step < 100000):
 
         # take user input
-        text = feed_response()
+        text = input("You :")
 
         # encode the input and add end of string token
         input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
@@ -33,16 +31,14 @@ def talk_from_internal():
             bot_input_ids,
             max_length=1000,
             pad_token_id=tokenizer.eos_token_id,
+            temperature = 0.9,
+            top_k = 10,
+            top_p = 0.9,
         )
 
         #print the output
         output = tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
         print(f"DialoGPT: {output}")
-
-        tts.synthesize_text(output)
-
-        # I think you can't make playsound play something if it's being called by another program?
-        playsound('output.mp3')
 
         step = step + 1
 

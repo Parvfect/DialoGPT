@@ -4,13 +4,10 @@ import os
 import openai
 import re
 import sys
-import colorama
 from google.cloud import speech, texttospeech
-from tts_gcloud import synthesize_text
 import pyaudio
 from six.moves import queue
 import time
-from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import random
 from playsound import playsound
